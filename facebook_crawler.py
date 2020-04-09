@@ -40,7 +40,6 @@ class FacebookCrawler:
 
         self.friends_names = Queue()
         self.arr_fr_pages = Queue()  # links of fr-s pages
-        self.arr_fr_links = Queue()  # links of someone friends
 
         self.login(login, password)
 
@@ -97,25 +96,46 @@ class FacebookCrawler:
         d_info = dict()
 
         self.driver.get(link)  # open page with info
-        # time.sleep(4)
         time.sleep(random.randrange(1, 5, 1))
+
         soup = BeautifulSoup(self.driver.page_source, 'html.parser')
-        self.links = soup.find_all(class_='_c24 _50f4')  # get job, education, city, own town
-        for word in self.links:
-            soup_2 = BeautifulSoup(str(word), 'html.parser')
-            text = soup_2.get_text('\t')
-            sep_text = text.strip().split('\t')
-            if len(sep_text) == 1:
-                d_info['some_info'] = sep_text[0]
-            else:
-                d_info[sep_text[0]] = sep_text[1]
+        self.links = soup.find_all(class_='_c24 _50f4')  # get job, education, city,
+        if self.links is None:                          # ЕСЛИ НЕТ ИНФЫ О job, education, city  ????????
+            d_info['NO_info'] = '-'
+        else:
+            for word in self.links:
+                soup_2 = BeautifulSoup(str(word), 'html.parser')
+                text = soup_2.get_text('\t')
+                sep_text = text.strip().split('\t')
+                if len(sep_text) == 1:
+                    d_info['some_info'] = sep_text[0]
+                else:
+                    _study = re.search(r'Учи[а-я]*', sep_text[0])  # parse
+                    _study_2 = re.search(r'Изуча[а-я]*', sep_text[0])  # parse
+
+                    if (_study_2 is not None) or (_study is not None):
+                        d_info['study'] = sep_text[1]
+                    elif sep_text[0].find('Живет') != -1:
+                        d_info['live_in'] = sep_text[1]
 
         self.links = soup.find_all(class_='_c24 _2ieq')  # get num, vk (or other social net), b-day
-        for link in self.links:
-            soup_3 = BeautifulSoup(str(link), 'html.parser')
-            text = soup_3.get_text('\t')
-            sep_text = text.strip().split('\t')
-            d_info[sep_text[0]] = sep_text[1]
+        if self.links is None:                        # ЕСЛИ НЕТ ИНФЫ О job, education, city  ??????????????
+            d_info['NO_info'] = '-'
+        else:
+            for link in self.links:
+                soup_3 = BeautifulSoup(str(link), 'html.parser')
+                text = soup_3.get_text('\t')
+                sep_text = text.strip().split('\t')
+
+                if sep_text[0].find('Телефоны') != -1:
+                        d_info['phone'] = sep_text[1]
+                elif sep_text[0].find('Дата рождения') != -1:
+                    d_info['b-day'] = sep_text[1]
+                elif sep_text[0].find('Ссылки на профили в Сети') != -1:
+                    d_info['links'] = sep_text[1]
+                elif sep_text[0].find('Электронный адрес') != -1:
+                    d_info['email'] = sep_text[1]
+
         return d_info
 
     def friends_amount(self) -> int:  # get info about amount of user's fr-s   = плохая функция
@@ -125,7 +145,6 @@ class FacebookCrawler:
             return number
 
     def get_friends(self, link) -> list:
-
         self.driver.get(link)  # open page with my friends
         time.sleep(random.randrange(1, 5, 1))
 
@@ -134,19 +153,16 @@ class FacebookCrawler:
         elems = WebDriverWait(self.driver, 30).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "_698")))
         a = len(elems)
         self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        # time.sleep(4)
         time.sleep(random.randrange(4, 6))
         elem1 = WebDriverWait(self.driver, 30).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "_698")))
         b = len(elem1)
-        while (b > a) and a != 50:  # get only 50 friends
+        while b > a:
             self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            # time.sleep(4)
             time.sleep(random.randrange(4, 6))
             elem1 = WebDriverWait(self.driver, 30).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "_698")))
             a = b
             b = len(elem1)
 
-        # time.sleep(4)
         time.sleep(random.randrange(1, 5, 1))
 
         arr_of_friends = []  # names of user's friends
@@ -165,7 +181,7 @@ class FacebookCrawler:
         return arr_of_friends
 
 
-def bfs(crawler_instance):  # CLEAN ARR FRIENDS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+def bfs(crawler_instance):
     visited = set()  # names of visited people
 
     while not crawler_instance.friends_names.empty():
@@ -199,7 +215,6 @@ def fill_storage(crawler_instance, user_id: str, user_name: str, d_information: 
         d_user['friends_list'] = d_friends_list
         crawler_instance.storage[user_id] = d_user
 
-        friends.clear()  # clean friends ???????????????????
     else:
         return '100 FRIENDS'  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -218,7 +233,7 @@ def main():
     user_name = 'Полина Ожиганова'
     fill_storage(crawler, id, user_name, arr_info, arr_friends)
 
-    bfs(crawler)  # call bfs from my friends
+    # bfs(crawler)  # call bfs from my friends
 
     ##############################################################################################
 
