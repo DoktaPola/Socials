@@ -30,7 +30,7 @@ def getFriends (friends, id):
             friends.append(person)
 
 
-def BFS (friends, q, id, count, current):
+def BFS (friends, q, used, id, count, current):
     info = vk.users.get(user_ids=id, fields='is_closed')
     if not('deactivated' in info[0]) and not(info[0]['is_closed']):
         response = vk.friends.get(user_id=id, fields='bdate, sex')
@@ -38,11 +38,7 @@ def BFS (friends, q, id, count, current):
         for i in range(0, min(count - current, response['count'])):
             resp = response['items'][i]
             person = dict()
-            temp = 0
-            for c in friends:
-                if resp['id'] == c['id']:
-                    temp = 1
-            if resp['first_name'] != 'DELETED' and temp != 1:
+            if resp['first_name'] != 'DELETED' and not(resp['id'] in used):
                 person['id'] = resp['id']
                 person['last_name'] = resp['last_name']
                 person['first_name'] = resp['first_name']
@@ -63,18 +59,20 @@ def BFS (friends, q, id, count, current):
                 else:
                     person['friends'] = 'unknown'
                 friends.append(person)
+                used.add(person['id'])
                 q.append(resp['id'])
             else:
                 k -= 1
         current += min(count - current, k)
         if current < count:
-            BFS(friends, q, q.pop(0), count, current)
+            BFS(friends, q, used, q.pop(0), count, current)
         else:
             exit
     else:
-        BFS(friends, q, q.pop(0), count, current)
+        BFS(friends, q, used, q.pop(0), count, current)
 
 start_time = time.time()
+used = set()
 q = []
 q.append(MY_USER_ID)
 count = int(input())
@@ -100,8 +98,9 @@ if not ('deactivated' in start_info[0]) and not (start_info[0]['is_closed']):
 else:
     start['friends'] = 'unknown'
 friends.append(start)
-BFS(friends, q, q.pop(0), count, 0)
+used.add(start['id'])
+BFS(friends, q, used, q.pop(0), count, 0)
 f = open('friends.json', 'w')
 f.write(json.dumps(friends, indent=4))
 f.close()
-print("--- %s seconds ---" % (time.time() - start_time))
+# print("--- %s seconds ---" % (time.time() - start_time))
