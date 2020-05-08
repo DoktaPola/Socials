@@ -4,7 +4,6 @@ import time
 code = '2f44f3122f44f3122f44f312422f34e2f922f442f44f312711a582d5fc2a27b99d64bf4'
 app = 7344619
 secret = 'GJdQphxS7yjBShLWemze'
-MY_USER_ID = '242896860'
 vk_session = vk_api.VkApi(app_id=app, client_secret=secret, token=code)
 vk = vk_session.get_api()
 
@@ -52,12 +51,13 @@ def BFS (friends, q, used, id, count, current):
 
 
 start_time = time.time()
+user_id = input()
+count = int(input())
 used = set()
 q = []
-q.append(MY_USER_ID)
-count = int(input())
+q.append(user_id)
 friends = []
-start_info = vk.users.get(user_ids=MY_USER_ID, fields='bdate, sex')
+start_info = vk.users.get(user_ids=user_id, fields='bdate, sex')
 start = dict()
 start['id'] = start_info[0]['id']
 start['last_name'] = start_info[0]['last_name']
@@ -77,6 +77,7 @@ if not ('deactivated' in start_info[0]) and not (start_info[0]['is_closed']):
     start['friends'] = start_friends['items']
 else:
     start['friends'] = 'unknown'
+    print('Closed account')
 friends.append(start)
 used.add(start['id'])
 BFS(friends, q, used, q.pop(0), count, 0)
