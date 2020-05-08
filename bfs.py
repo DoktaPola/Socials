@@ -9,27 +9,6 @@ vk_session = vk_api.VkApi(app_id=app, client_secret=secret, token=code)
 vk = vk_session.get_api()
 
 
-def getFriends (friends, id):
-    response = vk.friends.get(user_id=id, fields='bdate, sex')
-    for resp in response['items']:
-        person = dict()
-        if resp['first_name'] != 'DELETED':
-            person['id'] = resp['id']
-            person['last_name'] = resp['last_name']
-            person['first_name'] = resp['first_name']
-            if resp['sex'] == 2:
-                person['sex'] = 'male'
-            elif resp['sex'] == 1:
-                person['sex'] = 'female'
-            else:
-                person['sex'] = 'unknown'
-            if 'bdate' in resp:
-                person['bdate'] = resp['bdate']
-            else:
-                person['bdate'] = 'unknown'
-            friends.append(person)
-
-
 def BFS (friends, q, used, id, count, current):
     info = vk.users.get(user_ids=id, fields='is_closed')
     if not('deactivated' in info[0]) and not(info[0]['is_closed']):
@@ -70,6 +49,7 @@ def BFS (friends, q, used, id, count, current):
             exit
     else:
         BFS(friends, q, used, q.pop(0), count, current)
+
 
 start_time = time.time()
 used = set()
