@@ -75,13 +75,13 @@ else:
 if not ('deactivated' in start_info[0]) and not (start_info[0]['is_closed']):
     start_friends = vk.friends.get(user_id=start['id'])
     start['friends'] = start_friends['items']
+    friends.append(start)
+    used.add(start['id'])
+    BFS(friends, q, used, q.pop(0), count, 0)
+    f = open('friends.json', 'w')
+    f.write(json.dumps(friends, indent=4))
+    f.close()
 else:
     start['friends'] = 'unknown'
     print('Closed account')
-friends.append(start)
-used.add(start['id'])
-BFS(friends, q, used, q.pop(0), count, 0)
-f = open('friends.json', 'w')
-f.write(json.dumps(friends, indent=4))
-f.close()
 # print("--- %s seconds ---" % (time.time() - start_time))
