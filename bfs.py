@@ -1,6 +1,5 @@
 import vk_api
 import json
-import time
 code = '2f44f3122f44f3122f44f312422f34e2f922f442f44f312711a582d5fc2a27b99d64bf4'
 app = 7344619
 secret = 'GJdQphxS7yjBShLWemze'
@@ -50,7 +49,6 @@ def BFS (friends, q, used, id, count, current):
         BFS(friends, q, used, q.pop(0), count, current)
 
 
-start_time = time.time()
 user_id = input()
 count = int(input())
 used = set()
@@ -84,4 +82,3 @@ if not ('deactivated' in start_info[0]) and not (start_info[0]['is_closed']):
 else:
     start['friends'] = 'unknown'
     print('Closed account')
-# print("--- %s seconds ---" % (time.time() - start_time))
