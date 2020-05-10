@@ -80,5 +80,4 @@ if not ('deactivated' in start_info[0]) and not (start_info[0]['is_closed']):
     f.write(json.dumps(friends, indent=4))
     f.close()
 else:
-    start['friends'] = 'unknown'
     print('Closed account')
