@@ -57,20 +57,20 @@ q.append(user_id)
 friends = []
 start_info = vk.users.get(user_ids=user_id, fields='bdate, sex')
 start = dict()
-start['id'] = start_info[0]['id']
-start['last_name'] = start_info[0]['last_name']
-start['first_name'] = start_info[0]['first_name']
-if start_info[0]['sex'] == 2:
-    start['sex'] = 'male'
-elif start_info[0]['sex'] == 1:
-    start['sex'] = 'female'
-else:
-    start['sex'] = 'unknown'
-if 'bdate' in start_info[0]:
-    start['bdate'] = start_info[0]['bdate']
-else:
-    start['bdate'] = 'unknown'
 if not ('deactivated' in start_info[0]) and not (start_info[0]['is_closed']):
+    start['id'] = start_info[0]['id']
+    start['last_name'] = start_info[0]['last_name']
+    start['first_name'] = start_info[0]['first_name']
+    if start_info[0]['sex'] == 2:
+        start['sex'] = 'male'
+    elif start_info[0]['sex'] == 1:
+        start['sex'] = 'female'
+    else:
+        start['sex'] = 'unknown'
+    if 'bdate' in start_info[0]:
+        start['bdate'] = start_info[0]['bdate']
+    else:
+        start['bdate'] = 'unknown'
     start_friends = vk.friends.get(user_id=start['id'])
     start['friends'] = start_friends['items']
     friends.append(start)
