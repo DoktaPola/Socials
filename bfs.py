@@ -11,7 +11,6 @@ def BFS (friends, q, used, id, count, current):
     info = vk.users.get(user_ids=id, fields='is_closed')
     if not('deactivated' in info[0]) and not(info[0]['is_closed']):
         response = vk.friends.get(user_id=id, fields='bdate, sex')
-        k = response['count']
         for i in range(0, min(count - current, response['count'])):
             resp = response['items'][i]
             person = dict()
@@ -38,13 +37,11 @@ def BFS (friends, q, used, id, count, current):
                 friends.append(person)
                 used.add(person['id'])
                 q.append(resp['id'])
-            else:
-                k -= 1
-        current += min(count - current, k)
+        current = len(friends) - 1
         if current < count:
             BFS(friends, q, used, q.pop(0), count, current)
         else:
-            exit
+            return
     else:
         BFS(friends, q, used, q.pop(0), count, current)
 
