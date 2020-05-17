@@ -9,7 +9,11 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.common.exceptions import TimeoutException
+
+from selenium.common.exceptions import TimeoutException, WebDriverException
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.proxy import Proxy, ProxyType
 
 
 class FacebookCrawler:
@@ -17,8 +21,11 @@ class FacebookCrawler:
 
     def __init__(self, login, password):
         chrome_options = webdriver.ChromeOptions()
+
         prefs = {"profile.default_content_setting_values.notifications": 2}
         chrome_options.add_experimental_option("prefs", prefs)
+        chrome_options.add_argument("--disable-blink-features")  ## попытка избежать блока
+        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
 
         self.driver = webdriver.Chrome(chrome_options=chrome_options,
                                        executable_path=r'C:\chromedriver_win32\chromedriver.exe')
@@ -61,7 +68,6 @@ class FacebookCrawler:
         self.page_link = self.driver.current_url  # get link of my page
 
         self.driver.get(self.page_link)  # open my page
-        # time.sleep(4)
         time.sleep(random.randrange(1, 5, 1))
 
     def get_id(self, link) -> str:
@@ -100,7 +106,7 @@ class FacebookCrawler:
 
         soup = BeautifulSoup(self.driver.page_source, 'html.parser')
         self.links = soup.find_all(class_='_c24 _50f4')  # get job, education, city,
-        if self.links is None:                          # ЕСЛИ НЕТ ИНФЫ О job, education, city  ????????
+        if self.links is None:  # ЕСЛИ НЕТ ИНФЫ О job, education, city  ????????
             d_info['NO_info'] = '-'
         else:
             for word in self.links:
@@ -119,7 +125,7 @@ class FacebookCrawler:
                         d_info['live_in'] = sep_text[1]
 
         self.links = soup.find_all(class_='_c24 _2ieq')  # get num, vk (or other social net), b-day
-        if self.links is None:                        # ЕСЛИ НЕТ ИНФЫ О job, education, city  ??????????????
+        if self.links is None:  # ЕСЛИ НЕТ ИНФЫ О job, education, city  ??????????????
             d_info['NO_info'] = '-'
         else:
             for link in self.links:
@@ -128,7 +134,7 @@ class FacebookCrawler:
                 sep_text = text.strip().split('\t')
 
                 if sep_text[0].find('Телефоны') != -1:
-                        d_info['phone'] = sep_text[1]
+                    d_info['phone'] = sep_text[1]
                 elif sep_text[0].find('Дата рождения') != -1:
                     d_info['b-day'] = sep_text[1]
                 elif sep_text[0].find('Ссылки на профили в Сети') != -1:
@@ -153,12 +159,12 @@ class FacebookCrawler:
         elems = WebDriverWait(self.driver, 30).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "_698")))
         a = len(elems)
         self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(random.randrange(4, 6))
+        time.sleep(random.randrange(6, 10))  # to load all elems
         elem1 = WebDriverWait(self.driver, 30).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "_698")))
         b = len(elem1)
         while b > a:
             self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            time.sleep(random.randrange(4, 6))
+            time.sleep(random.randrange(6, 10))  # to load all elems
             elem1 = WebDriverWait(self.driver, 30).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "_698")))
             a = b
             b = len(elem1)
@@ -168,7 +174,7 @@ class FacebookCrawler:
         arr_of_friends = []  # names of user's friends
 
         soup = BeautifulSoup(self.driver.page_source, "html.parser")
-        #
+
         for i in soup.find_all('div', {'class': 'fsl fwb fcb'}):  # имена друзей
             names = i.find_all('a', href=True)
             for name in names:
@@ -188,23 +194,33 @@ def bfs(crawler_instance):
         name = crawler_instance.friends_names.get()
         if name not in visited:
             visited.add(name)  # add name in visited
-            page_link = crawler_instance.arr_fr_pages.get()  # взяла из очереди ссылку на стр человека
+            try:
+                page_link = crawler_instance.arr_fr_pages.get()  # взяла из очереди ссылку на стр человека
 
-            user_id = crawler_instance.get_id(page_link)
-            user_name = name
+                user_id = crawler_instance.get_id(page_link)
+                user_name = name
 
-            arr_links_inf_fr = crawler_instance.get_links_info_friends()  # return 2 links to open inf and fr pages
+                arr_links_inf_fr = crawler_instance.get_links_info_friends()  # return 2 links to open inf and fr pages
 
-            user_information = crawler_instance.get_info(arr_links_inf_fr[0])
-            user_friends = crawler_instance.get_friends(arr_links_inf_fr[1])
+                user_information = crawler_instance.get_info(arr_links_inf_fr[0])
+                user_friends = crawler_instance.get_friends(arr_links_inf_fr[1])
 
-            fill_storage(crawler_instance, user_id, user_name, user_information, user_friends)  # add new person in stor
+                fill_storage(crawler_instance, user_id, user_name, user_information,
+                             user_friends)  # add new person in stor
+
+            except TimeoutException:
+                f = open('my_dict.json', 'w', encoding="utf-8")
+                f.write(json.dumps(crawler_instance.storage, indent=4, ensure_ascii=False, sort_keys=False))
+                f.close()
+                crawler_instance.driver.close()
+        else:
+            crawler_instance.arr_fr_pages.get()  # удаляю ссыдку на стр, если уже смотрели такого Польз
 
 
 def fill_storage(crawler_instance, user_id: str, user_name: str, d_information: dict, friends: list):
     crawler_instance.counter += 1
 
-    if crawler_instance.counter < 100:  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    if crawler_instance.counter < 150:  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         d_information['name'] = user_name
 
         d_friends_list = dict()
@@ -216,12 +232,12 @@ def fill_storage(crawler_instance, user_id: str, user_name: str, d_information: 
         crawler_instance.storage[user_id] = d_user
 
     else:
-        return '100 FRIENDS'  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        return '150 FRIENDS'  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
 def main():
     # num_of_people = int(input())
-    crawler = FacebookCrawler(login='irkaxortiza@mail.ru', password='YouWannaBeOnTop')
+    crawler = FacebookCrawler(login='irkaxortiza@mail.ru', password='17YouWannaBeOnTop1995')
 
     # MY ADDING!!!
     id = crawler.get_id(crawler.page_link)  # only MY id
@@ -233,13 +249,13 @@ def main():
     user_name = 'Полина Ожиганова'
     fill_storage(crawler, id, user_name, arr_info, arr_friends)
 
-    # bfs(crawler)  # call bfs from my friends
+    bfs(crawler)  # call bfs from my friends
 
     ##############################################################################################
 
-    f = open('my_dict.json', 'w', encoding="utf-8")
-    f.write(json.dumps(crawler.storage, indent=4, ensure_ascii=False, sort_keys=False))
-    f.close()
+    # f = open('my_dict.json', 'w', encoding="utf-8")
+    # f.write(json.dumps(crawler.storage, indent=4, ensure_ascii=False, sort_keys=False))
+    # f.close()
 
 
 if __name__ == '__main__':
