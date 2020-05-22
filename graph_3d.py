@@ -466,11 +466,50 @@ def draw_connection(G, path, my_ax):
     plt.show()
 
 
+# def find_common_friends_between_friends():
+#     with open('C:' + os.sep + 'KURSACH' + os.sep + 'my_dict.json', 'r', encoding='utf-8') as f:  # ПЕРЕДЕЛАТЬ
+#         data = json.loads(f.read())
+#
+#         arr_sets = []
+#         ############ SETS ##############
+#         main_user_fr = set()  # set with fr-s of the main user
+#         interaction_set = set()
+#
+#         for person in data:
+#             ###### USER ######
+#             one_dict = data[person]  # доступны 2 словаря
+#             info = one_dict['general_info']  # словарь с инфой
+#             name = info['name']
+#             if name == USER:
+#                 _fr = one_dict['friends_list']
+#                 friends = _fr['friends']
+#                 main_user_fr = set(friends)
+#             else:
+#                 _fr_1 = one_dict['friends_list']
+#                 friends_1 = _fr_1['friends']
+#                 fr_set_1 = set(friends_1)
+#                 arr_sets.append(fr_set_1)
+#
+#         for i in range(0, len(arr_sets)):
+#             for j in range(i + 1, len(arr_sets) - 1):
+#                 interaction = arr_sets[i].intersection(arr_sets[j])
+#                 if interaction:
+#                     while interaction:
+#                         user_name = interaction.pop()
+#                         interaction_set.add(user_name)
+#
+#         people = list(interaction_set.difference(main_user_fr))
+#         if people:
+#             return people
+#         else:
+#             return None
+
 def find_common_friends_between_friends():
     with open('C:' + os.sep + 'KURSACH' + os.sep + 'my_dict.json', 'r', encoding='utf-8') as f:  # ПЕРЕДЕЛАТЬ
         data = json.loads(f.read())
 
         arr_sets = []
+        arr_interaction = []
         ############ SETS ##############
         main_user_fr = set()  # set with fr-s of the main user
         interaction_set = set()
@@ -483,24 +522,101 @@ def find_common_friends_between_friends():
             if name == USER:
                 _fr = one_dict['friends_list']
                 friends = _fr['friends']
-                main_user_fr = set(friends)
+                main_user_fr = set(friends) # все друзья человека в set
             else:
                 _fr_1 = one_dict['friends_list']
                 friends_1 = _fr_1['friends']
                 fr_set_1 = set(friends_1)
-                arr_sets.append(fr_set_1)
+                arr_sets.append(fr_set_1) # set друзей доюавляется в list
 
         for i in range(0, len(arr_sets)):
             for j in range(i + 1, len(arr_sets) - 1):
-                interaction = arr_sets[i].intersection(arr_sets[j])
+                interaction = arr_sets[i].intersection(arr_sets[j]) # нахожу общих друзей между друзей своих друзей
                 if interaction:
-                    while interaction:
-                        user_name = interaction.pop()
-                        interaction_set.add(user_name)
+                    arr_interaction.append(interaction) # все пересечения в списке
 
-        people = list(interaction_set.difference(main_user_fr))
+        famous_friends = {}
+        for common in arr_interaction:
+            not_fr = list(common.difference(main_user_fr)) # если у юзера нет этих людей в др
+            for person in not_fr:
+                if person not in famous_friends.keys():
+                    famous_friends[person] = 1
+                    # famous_friends.append(fr_count)
+                else:
+                    famous_friends[person] += 1
 
-    return people
+        people = []
+        for key, value in famous_friends.items():
+            if value >= 10 and key != USER:  # САМ ПОЛЬЗОВАТЕЛЬ ЗАДАЕТ СКОЛЬКО VALUE!!!!!!!!!!!!!!!!!
+                people.append(key)
+
+        if people:
+            return people
+        else:
+            return None
+
+
+def draw_common_friends_between_friends(G, common_fr_between_fr, my_ax):
+        if not common_fr_between_fr:  # если path == None
+            ###########################################
+            # LEGEND
+            fake2Dline = mpl.lines.Line2D([0], [0], linestyle="none", c='y', marker='x')
+            my_ax.legend([fake2Dline], ['- no common friends'], loc='upper right',
+                         title='WARNING:'.format(), numpoints=1, facecolor='#9370DB')
+        else:
+            _draw_connection(G, common_fr_between_fr)
+
+            pos = nx.get_node_attributes(G, 'pos')
+
+            for key, value in pos.items():
+                if key in common_fr_between_fr:  # если ключ есть в собранном path
+                    ###########################################
+                    # LEGEND
+                    fake2Dline = mpl.lines.Line2D([], [], linestyle="none", c='#00FFFF', marker='o')
+                    legend_elements = []
+                    for f in range(0, len(common_fr_between_fr)):
+                        legend_elements.append(fake2Dline)
+
+                    labels = [f'{s}' for s in common_fr_between_fr]
+                    my_ax.legend(handles=legend_elements, labels=labels, loc='upper right',
+                                 title='Path:', numpoints=1, facecolor='#9370DB')
+                    ##########################
+                    xi = value[0]
+                    yi = value[1]
+                    zi = value[2]
+
+                    # Scatter plot
+                    my_ax.scatter(xi, yi, zi, c='#00FFFF', s=20 + 20 * G.degree(key), edgecolors='k',
+                                  alpha=0.7)  # change node color
+                    if key != USER:
+                        my_ax.text(xi, yi, zi, key.replace(' ', '\n'), color='#00FFFF')  # change label color
+
+                # draw edges
+                copy_common_fr = common_fr_between_fr.copy()
+                for i, j in enumerate(G.edges()):
+                    if j[1] in copy_common_fr:
+                        copy_common_fr.remove(j[1])
+                        try:
+                            x = np.array((pos[j[0]][0], pos[j[1]][0]))
+                            y = np.array((pos[j[0]][1], pos[j[1]][1]))
+                            z = np.array((pos[j[0]][2], pos[j[1]][2]))
+                        except:
+                            continue
+
+                        # Plot the connecting lines
+                        # my_ax.plot(x, y, z, c='#00FFFF', alpha=0.5)
+                        my_ax.plot(x, y, z, c='#00FF00', alpha=0.5)
+
+        my_ax.view_init(30, 0)   # ?????????????????????????????
+            # Hide the axes
+        my_ax.set_axis_off()
+
+        # get black background
+        plt.gca().patch.set_facecolor('black')
+        my_ax.w_xaxis.set_pane_color((0.8, 0.8, 0.8, 1.0))
+        my_ax.w_yaxis.set_pane_color((0.8, 0.8, 0.8, 1.0))
+        my_ax.w_zaxis.set_pane_color((0.8, 0.8, 0.8, 1.0))
+        plt.show()
 
 
 def main():
@@ -528,16 +644,17 @@ def main():
     #                      FIND PATH
     # path = find_connection(G, 'Полина Ожиганова', 'Katerina Tyulina') # path exists
     # path = find_connection(G, 'Полина Ожиганова', 'Олег Паканин')  # path exists
-    path = find_connection(G, 'Полина Ожиганова', 'Гарри Поттер')  # path DOESN'T exist
+    # path = find_connection(G, 'Полина Ожиганова', 'Гарри Поттер')  # path DOESN'T exist
 
     #                      DRAW PATH
-    draw_connection(G, path, my_ax)
+    # draw_connection(G, path, my_ax)
 
     #                      FIND COMMON FRIENDS
+    common_fr_between_fr = find_common_friends_between_friends()
     # print(find_common_friends_between_friends())
 
+    #                      DRAW COMMON FRIENDS
+    draw_common_friends_between_friends(G, common_fr_between_fr, my_ax)
 
 if __name__ == '__main__':
     main()
-
-
