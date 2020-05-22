@@ -1,4 +1,9 @@
+import json
+import os
 import re
+import time
+from collections import deque
+
 import matplotlib as mpl
 import random
 
@@ -7,16 +12,11 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 import numpy as np
 import warnings
-
+import queue
 import networkx as nx
 import pandas as pd
 import pylab
 from mpl_toolkits.mplot3d import proj3d
-
-# from __future__ import division
-
-# plt.rcParams["figure.figsize"] = (20, 10)
-# plt.style.use('dark_background')  # темный фон
 
 warnings.filterwarnings('ignore')
 csfont = {'fontname': 'Comic Sans MS'}
@@ -25,12 +25,14 @@ csfont = {'fontname': 'Comic Sans MS'}
 labels = []
 table = pd.read_csv('C:\KURSACH\File_CSV.csv')
 row_count = len(table['name'])  # сколько строчек
-USER = "Полина Ожиганова"  # СДЕЛАТЬ НОРМАЛЬНО
+
+# USER = 'Полина Ожиганова'  # СДЕЛАТЬ НОРМАЛЬНО!!!!!!!!!!!!!!!!!!!!!!!!!!!
+USER = table['name'][0]
 
 
 def generate_random_3Dgraph():
     FB = nx.from_pandas_edgelist(table, source='name', target='friend')  # создаю граф с ребрами без атрибутов
-    pos = {i: (random.uniform(0, 20), random.uniform(20, 25), random.uniform(0, 20)) for i in range(row_count)}
+    pos = {i: (random.uniform(15, 20), random.uniform(15, 25), random.uniform(0, 20)) for i in range(row_count)}
 
     for name in FB.nodes():  # заполняю nodes  данными
         visited = set()
@@ -50,7 +52,7 @@ def generate_random_3Dgraph():
                 FB.node[name]['e-mail'] = data['e-mail'][ind]
                 FB.node[name]['pos'] = pos[ind]
             # elif name in list(table['friend']):  # друзья друзей
-            #     if FB.degree(name) > 1: # add only people whose degree is bigger then 1
+            #     if FB.degree(name) > 1:  # add only people whose degree is bigger then 1
             #         data_fr = table.loc[table['friend'] == name]  # ищу все строки с именем
             #         ind_fr = data_fr.index[0]  # считаю индекс первой строки с таким именем, для сбора всех данных
             #         FB.node[name]['pos'] = pos[ind_fr]
@@ -77,7 +79,7 @@ def network_plot_3D(G, angle, save=False):
     with plt.style.context(('ggplot')):
 
         # fig = plt.figure(figsize=(10, 7))
-        fig = plt.figure(figsize=(30, 15))
+        fig = plt.figure(figsize=(100, 80))
         fig.suptitle('Facebook Network',
                      fontfamily='Comic Sans MS',
                      fontstyle='italic',
@@ -360,11 +362,145 @@ def find_by_info(G, column, info, my_ax):  # нахожу в графе инфу
     if column == 'b-day':
         work_b_day(G, attr, info, my_ax)
         pass
-    # if column == 'links':
-    #     pass
 
-    # if column == 'e-mail':
-    #     pass
+
+def find_connection(G, main_person, needed_person):  # bfs till 2nd level of friends
+    path = []
+
+    count_stars = 0
+    friends_queue = deque()
+    friends_queue += G[main_person]
+    friends_queue.append('*')
+    visited = []
+
+    visited.append(main_person)
+    while friends_queue:
+        person = friends_queue.popleft()
+        if person != '*':
+            if not person in visited:
+                if person == needed_person:
+                    path.append(visited[count_stars])
+                    path.append(needed_person)
+                    return path
+                else:
+                    friends_queue += G[person]
+                    friends_queue.append('*')
+                    visited.append(person)
+        else:
+            path.append(visited[count_stars])
+            count_stars += 1
+    return None  #########################
+
+
+def _draw_connection(G, path):
+    pos = {i: (random.uniform(15, 20), random.uniform(15, 25), random.uniform(0, 20)) for i in range(row_count)}
+    for name in G.nodes():  # заполняю nodes  данными
+        visited = set()
+        if name not in visited:
+            visited.add(name)
+            if name in list(table['friend']):  # друзья друзей
+                if (name in path) and (not G.node.get(name)):
+                    data_fr = table.loc[table['friend'] == name]  # ищу все строки с именем
+                    ind_fr = data_fr.index[0]  # считаю индекс первой строки с таким именем, для сбора всех данных
+                    G.node[name]['pos'] = pos[ind_fr]
+        else:
+            continue
+
+
+def draw_connection(G, path, my_ax):
+    if not path:  # если path == None
+        ###########################################
+        # LEGEND
+        fake2Dline = mpl.lines.Line2D([0], [0], linestyle="none", c='y', marker='x')
+        my_ax.legend([fake2Dline], ['- no connection'], loc='upper right',
+                     title='WARNING:'.format(), numpoints=1, facecolor='#9370DB')
+    else:
+
+        _draw_connection(G, path)
+
+        pos = nx.get_node_attributes(G, 'pos')
+
+        for key, value in pos.items():
+            if key in path:  # если ключ есть в собранном path
+                ###########################################
+                # LEGEND
+                fake2Dline = mpl.lines.Line2D([], [], linestyle="none", c='#FF1493', marker='o')
+                legend_elements = []
+                for f in range(0, len(path)):
+                    legend_elements.append(fake2Dline)
+
+                labels = [f'{s}' for s in path]
+                my_ax.legend(handles=legend_elements, labels=labels, loc='upper right',
+                             title='Path:', numpoints=1, facecolor='#9370DB')
+                ##########################
+                xi = value[0]
+                yi = value[1]
+                zi = value[2]
+
+                # Scatter plot
+                my_ax.scatter(xi, yi, zi, c='#FF1493', s=20 + 20 * G.degree(key), edgecolors='k',
+                              alpha=0.7)  # change node color
+                if key != USER:
+                    my_ax.text(xi, yi, zi, key.replace(' ', '\n'), color='#FF1493')  # change label color
+
+            # draw edges
+            for i, j in enumerate(G.edges()):
+                if (j[0] in path) and (j[1] in path):
+                    try:
+                        x = np.array((pos[j[0]][0], pos[j[1]][0]))
+                        y = np.array((pos[j[0]][1], pos[j[1]][1]))
+                        z = np.array((pos[j[0]][2], pos[j[1]][2]))
+                    except:
+                        continue
+
+                    # Plot the connecting lines
+                    my_ax.plot(x, y, z, c='#FF1493', alpha=0.5)
+        # Hide the axes
+    my_ax.set_axis_off()
+
+    # get black background
+    plt.gca().patch.set_facecolor('black')
+    my_ax.w_xaxis.set_pane_color((0.8, 0.8, 0.8, 1.0))
+    my_ax.w_yaxis.set_pane_color((0.8, 0.8, 0.8, 1.0))
+    my_ax.w_zaxis.set_pane_color((0.8, 0.8, 0.8, 1.0))
+    plt.show()
+
+
+def find_common_friends_between_friends():
+    with open('C:' + os.sep + 'KURSACH' + os.sep + 'my_dict.json', 'r', encoding='utf-8') as f:  # ПЕРЕДЕЛАТЬ
+        data = json.loads(f.read())
+
+        arr_sets = []
+        ############ SETS ##############
+        main_user_fr = set()  # set with fr-s of the main user
+        interaction_set = set()
+
+        for person in data:
+            ###### USER ######
+            one_dict = data[person]  # доступны 2 словаря
+            info = one_dict['general_info']  # словарь с инфой
+            name = info['name']
+            if name == USER:
+                _fr = one_dict['friends_list']
+                friends = _fr['friends']
+                main_user_fr = set(friends)
+            else:
+                _fr_1 = one_dict['friends_list']
+                friends_1 = _fr_1['friends']
+                fr_set_1 = set(friends_1)
+                arr_sets.append(fr_set_1)
+
+        for i in range(0, len(arr_sets)):
+            for j in range(i + 1, len(arr_sets) - 1):
+                interaction = arr_sets[i].intersection(arr_sets[j])
+                if interaction:
+                    while interaction:
+                        user_name = interaction.pop()
+                        interaction_set.add(user_name)
+
+        people = list(interaction_set.difference(main_user_fr))
+
+    return people
 
 
 def main():
@@ -379,6 +515,7 @@ def main():
     # find_by_info(G, 'study', 'гимназия', my_ax)  # школа сущ
 
     # find_by_info(G, 'live in', 'Nizhniy Novgorod', my_ax)  # RE
+    # find_by_info(G, 'live in', 'Москва', my_ax)  # RE
     # find_by_info(G, 'live in', 'Nizhniy Novgorod, Russia', my_ax)
     # find_by_info(G, 'live in', 'N N', my_ax)  #  не сущ
     #
@@ -387,6 +524,17 @@ def main():
     # find_by_info(G, 'b-day', 'Ноябрь', my_ax)  # месяц НОЯБРЬ
     # find_by_info(G, 'b-day', '17', my_ax)  # число
     # find_by_info(G, 'b-day', '1995', my_ax)  # год
+
+    #                      FIND PATH
+    # path = find_connection(G, 'Полина Ожиганова', 'Katerina Tyulina') # path exists
+    # path = find_connection(G, 'Полина Ожиганова', 'Олег Паканин')  # path exists
+    path = find_connection(G, 'Полина Ожиганова', 'Гарри Поттер')  # path DOESN'T exist
+
+    #                      DRAW PATH
+    draw_connection(G, path, my_ax)
+
+    #                      FIND COMMON FRIENDS
+    # print(find_common_friends_between_friends())
 
 
 if __name__ == '__main__':
