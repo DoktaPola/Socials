@@ -296,31 +296,20 @@ def find_by_info(G, column, info, my_ax):  # нахожу в графе инфу
         pass
 
 
-def find_connection(G, main_person, needed_person):  # bfs till 2nd level of friends
-    path = []
+def find_connection(G, start, end, q):  # bfs
+    temp_path = [start]
+    q.append(temp_path)
 
-    count_stars = 0
-    friends_queue = deque()
-    friends_queue += G[main_person]
-    friends_queue.append('*')
-    visited = []
-
-    visited.append(main_person)
-    while friends_queue:
-        person = friends_queue.popleft()
-        if person != '*':
-            if not person in visited:
-                if person == needed_person:
-                    path.append(visited[count_stars])
-                    path.append(needed_person)
-                    return path
-                else:
-                    friends_queue += G[person]
-                    friends_queue.append('*')
-                    visited.append(person)
-        else:
-            path.append(visited[count_stars])
-            count_stars += 1
+    while len(q) != 0:
+        tmp_path = q.popleft()
+        last_node = tmp_path[len(tmp_path) - 1]
+        if last_node == end:
+            return tmp_path
+        for link_node in G[last_node]:
+            if link_node not in tmp_path:
+                new_path = []
+                new_path = tmp_path + [link_node]
+                q.append(new_path)
     return None
 
 
@@ -369,8 +358,8 @@ def draw_connection(G, path, my_ax):
                 yi = value[1]
                 zi = value[2]
 
-                # Scatter plot      // 20 * G.degree(key)
-                my_ax.scatter(xi, yi, zi, c='#FF1493', s=100 * G.degree(key) ** 0.5, edgecolors='k',
+                # Scatter plot
+                my_ax.scatter(xi, yi, zi, c='#FF1493', s=20 + 20 * G.degree(key), edgecolors='k',
                               alpha=0.75)  # change node color
                 if key != USER:
                     my_ax.text(xi, yi, zi, key.replace(' ', '\n'), color='#FF1493')  # change label color
@@ -660,12 +649,15 @@ def main():
     # find_by_info(G, 'b-day', '1995', my_ax)  # год
 
     #                      FIND PATH
-    # path = find_connection(G, 'Полина Ожиганова', 'Katerina Tyulina') # path exists
-    # path = find_connection(G, 'Полина Ожиганова', 'Олег Паканин')  # path exists
-    # path = find_connection(G, 'Полина Ожиганова', 'Гарри Поттер')  # path DOESN'T exist
+    # path_queue = MyQUEUE()  # now we make a queue
 
+    friends_queue = deque()  # NEW
+    # path = find_connection(G, 'Полина Ожиганова', 'Katerina Tyulina', path_queue)  # path exists
+    # path = find_connection(G, 'Полина Ожиганова', 'Олег Паканин', path_queue)  # path exists
+    # path = find_connection(G, 'Полина Ожиганова', 'Гарри Поттер', path_queue)  # path DOESN'T exist
+    path = find_connection(G, 'Tanya Termeneva', 'Елена Рогожина', friends_queue)  # path exists
     #                      DRAW PATH
-    # draw_connection(G, path, my_ax)
+    draw_connection(G, path, my_ax)
 
     #                      FIND COMMON FRIENDS
     # common_fr_between_fr = find_common_friends_between_friends()
@@ -682,4 +674,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
