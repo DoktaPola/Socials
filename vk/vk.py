@@ -27,14 +27,16 @@ def findWay(way, queue, used, ancestor, idFinale, finalFriends, time_limit):
             intersection = set(response['items']).intersection(finalFriends)
             if intersection:
                 intersection = str(list(set(response['items']).intersection(finalFriends))[0])
-                ancestor[person[0]] = person[1]
-                ancestor[intersection] = person[0]
-                ancestor[idFinale] = intersection
-                current = idFinale
-                while current:
-                    way.append(current)
-                    current = ancestor[current]
-                return
+                test_info = vk.users.get(user_ids=intersection, fields='is_closed')
+                if not ('deactivated' in test_info[0]):
+                    ancestor[person[0]] = person[1]
+                    ancestor[intersection] = person[0]
+                    ancestor[idFinale] = intersection
+                    current = idFinale
+                    while current:
+                        way.append(current)
+                        current = ancestor[current]
+                    return
             for id in response['items']:
                 if not(str(id) in used):
                     queue.append((str(id), person[0]))
