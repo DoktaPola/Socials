@@ -1,7 +1,7 @@
 import vk_api
 import json
 import time
-# 242896860
+
 code = '2f44f3122f44f3122f44f312422f34e2f922f442f44f312711a582d5fc2a27b99d64bf4'
 app = 7344619
 secret = 'GJdQphxS7yjBShLWemze'
