@@ -2,6 +2,7 @@ import json
 import os
 import random
 import re
+import time
 import warnings
 from collections import deque
 
@@ -21,7 +22,7 @@ table = pd.read_csv('C:\KURSACH\File_CSV.csv')
 # table = pd.read_csv('C:\KURSACH\Alena_Popova_CSV.csv')
 # table = pd.read_csv('C:\KURSACH\KOLYA_CSV.csv')
 row_count = len(table['name'])  # сколько строчек
-
+TIME_LIMIT = 60
 USER = table['name'][0]
 
 
@@ -297,10 +298,14 @@ def find_by_info(G, column, info, my_ax):  # нахожу в графе инфу
 
 
 def find_connection(G, start, end, q):  # bfs
+    start_time = time.time()
+
     temp_path = [start]
     q.append(temp_path)
 
     while len(q) != 0:
+        if time.time() - start_time > TIME_LIMIT:
+            return None
         tmp_path = q.popleft()
         last_node = tmp_path[len(tmp_path) - 1]
         if last_node == end:
@@ -381,7 +386,7 @@ def draw_connection(G, path, my_ax):
 
 
 def find_common_friends_between_friends():
-    with open('C:' + os.sep + 'KURSACH' + os.sep + 'my_dict.json', 'r', encoding='utf-8') as f:  # ПЕРЕДЕЛАТЬ
+    with open('C:' + os.sep + 'KURSACH' + os.sep + 'my_dict.json', 'r', encoding='utf-8') as f:  # ПЕРЕДЕЛАТЬ!!!!!!!!!!!
         data = json.loads(f.read())
 
         arr_sets = []
@@ -396,16 +401,16 @@ def find_common_friends_between_friends():
             if name == USER:
                 _fr = one_dict['friends_list']
                 friends = _fr['friends']
-                main_user_fr = set(friends)  # все друзья человека в set
+                main_user_fr = set(friends)  # все друзья главн пользователя в set
             else:
                 _fr_1 = one_dict['friends_list']
                 friends_1 = _fr_1['friends']
                 fr_set_1 = set(friends_1)
-                arr_sets.append(fr_set_1)  # set друзей доюавляется в list
+                arr_sets.append(fr_set_1)  # set друзей добавляется в list
 
         for i in range(0, len(arr_sets)):
             for j in range(i + 1, len(arr_sets) - 1):
-                interaction = arr_sets[i].intersection(arr_sets[j])  # нахожу общих друзей между друзей своих друзей
+                interaction = arr_sets[i].intersection(arr_sets[j])  # нахожу общих друзей между друзей друзей гл. юзера
                 if interaction:
                     arr_interaction.append(interaction)  # все пересечения в списке
 
@@ -479,16 +484,14 @@ def draw_common_friends_between_friends(G, common_fr_between_fr, my_ax):
                         continue
 
                     # Plot the connecting lines
-                    # my_ax.plot(x, y, z, c='#00FFFF', alpha=0.5)
-                    # my_ax.plot(x, y, z, c='#00FF00', alpha=0.5, linewidth=0.3)
                     my_ax.plot(x, y, z, c='#00FF00', alpha=0.3, linewidth=0.3)
 
-    my_ax.view_init(30, 0)  # ?????????????????????????????
+    my_ax.view_init(30, 0)
     show_graph(my_ax)  # показывает граф
 
 
 def find_groups():  # доделать
-    with open('C:' + os.sep + 'KURSACH' + os.sep + 'my_dict.json', 'r', encoding='utf-8') as f:  # ПЕРЕДЕЛАТЬ
+    with open('C:' + os.sep + 'KURSACH' + os.sep + 'my_dict.json', 'r', encoding='utf-8') as f:  # ПЕРЕДЕЛАТЬ !!!!!!!!!
         data = json.loads(f.read())
 
         arr_sets = []
@@ -531,7 +534,7 @@ def find_groups():  # доделать
                     study_groups[name] = info['study']
                     # relatives_group[name] =
 
-        arr_with_groups = []  # хранит все собранные групы
+        arr_with_groups = []  # хранит все собранные группы
         additional_set = set()  # для одной группы
         visited = set()  # для фильтрации посещенных людей
         for key1, value1 in study_groups.items():
@@ -545,7 +548,7 @@ def find_groups():  # доделать
                             visited.add(key2)
                             additional_set.add(key2)
             if additional_set:
-                additional_set.add('*' + value1)  # добавляю само место учебы(общее для данных людей)
+                additional_set.add('*' + value1)  # добавляю само место учебы(общее для данной группы)
             arr_with_groups.append(additional_set)
             additional_set = set()
 
@@ -560,7 +563,7 @@ def draw_groups(G, groups, my_ax):
             all_groups.append(group)
 
     if not all_groups:
-        ###########################################
+        #####################
         # LEGEND
         fake2Dline = mpl.lines.Line2D([0], [0], linestyle="none", c='y', marker='x')
         my_ax.legend([fake2Dline], ['- no groups'], loc='upper right',
@@ -582,10 +585,10 @@ def draw_groups(G, groups, my_ax):
             color = random.choice(colors)  # выбор цвета
             colors.remove(color)
 
-            location = random.choice(locations)  # выбор цвета
+            location = random.choice(locations)  # выбор расположения
             locations.remove(location)
 
-            ###########################################
+            ######################################
             # LEGEND
             fake2Dline = mpl.lines.Line2D([], [], linestyle="none", c=color, marker='o')
             legend_elements = []
@@ -622,7 +625,7 @@ def draw_groups(G, groups, my_ax):
                     if key != USER:
                         my_ax.text(xi, yi, zi, key.replace(' ', '\n'), color=color)  # change label color
 
-    my_ax.view_init(30, 0)  # ?????????????????????????????
+    my_ax.view_init(30, 0)
     show_graph(my_ax)  # показывает граф
 
 
@@ -648,14 +651,12 @@ def main():
     # find_by_info(G, 'b-day', '17', my_ax)  # число
     # find_by_info(G, 'b-day', '1995', my_ax)  # год
 
-    #                      FIND PATH
-    # path_queue = MyQUEUE()  # now we make a queue
-
-    friends_queue = deque()  # NEW
-    # path = find_connection(G, 'Полина Ожиганова', 'Katerina Tyulina', path_queue)  # path exists
-    # path = find_connection(G, 'Полина Ожиганова', 'Олег Паканин', path_queue)  # path exists
-    # path = find_connection(G, 'Полина Ожиганова', 'Гарри Поттер', path_queue)  # path DOESN'T exist
-    path = find_connection(G, 'Tanya Termeneva', 'Елена Рогожина', friends_queue)  # path exists
+    #                      FIND PATH    ОГРАНИЧИТЬ ПО ВР!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    friends_queue = deque()  # !!!!
+    # path = find_connection(G, 'Полина Ожиганова', 'Katerina Tyulina', friends_queue)  # path exists
+    # path = find_connection(G, 'Полина Ожиганова', 'Олег Паканин', friends_queue)  # path exists
+    path = find_connection(G, 'Полина Ожиганова', 'Гарри Поттер', friends_queue)  # path DOESN'T exist
+    # path = find_connection(G, 'Tanya Termeneva', 'Елена Рогожина', friends_queue)  # path exists
     #                      DRAW PATH
     draw_connection(G, path, my_ax)
 
@@ -666,7 +667,7 @@ def main():
     # draw_common_friends_between_friends(G, common_fr_between_fr, my_ax)
 
     #                      FIND GROUPS
-    # groups = find_groups() # ОСТАВИТЬ???
+    # groups = find_groups() # ОСТАВИТЬ????????????????????????????????????????????????
 
     #                      DRAW GROUPS
     # draw_groups(G, groups, my_ax)
@@ -674,5 +675,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
