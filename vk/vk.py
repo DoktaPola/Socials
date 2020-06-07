@@ -104,6 +104,7 @@ def BFS (friends, q, used, id, count, current, start_time, time_limit):
 
 def findGroups(id, people, time_limit):
     used = set()
+    queue = []
     start_time = time.time()
     info = vk.users.get(user_ids=id, fields='is_closed')
     temp = dict()
@@ -117,33 +118,31 @@ def findGroups(id, people, time_limit):
         response = vk.friends.get(user_id=id, fields='sex')
         for resp in response['items']:
             if time.time() - start_time < time_limit and len(people) < 200:
-                if not (resp['id'] in used) and not (resp['first_name'] == 'DELETED'):
+                person_info = vk.users.get(user_ids=resp['id'], fields='is_closed')
+                if not (resp['id'] in used) and not (resp['first_name'] == 'DELETED') and not(person_info[0]['is_closed']):
                     person = dict()
                     person['id'] = resp['id']
                     person['last_name'] = resp['last_name']
                     person['first_name'] = resp['first_name']
                     person['groups'] = vk.groups.get(user_id=resp['id'], extended=1, count=200)['items']
                     people.append(person)
-                    used.add(resp['id'])
-                    person_info = vk.users.get(user_ids=resp['id'], fields='is_closed')
-                    if not ('deactivated' in person_info[0]) and not (person_info[0]['is_closed']):
-                        friend_friends = vk.friends.get(user_id=resp['id'], fields='sex')
-                        for friend in friend_friends['items']:
-                            if time.time() - start_time < time_limit and len(people) < 200:
-                                new_info = vk.users.get(user_ids=friend['id'], fields='is_closed')
-                                if not (friend['id'] in used) and not ('deactivated' in new_info[0]) and not (
-                                new_info[0]['is_closed']):
-                                    user = dict()
-                                    user['id'] = friend['id']
-                                    user['last_name'] = friend['last_name']
-                                    user['first_name'] = friend['first_name']
-                                    user['groups'] = vk.groups.get(user_id=friend['id'], extended=1, count=200)['items']
-                                    people.append(user)
-                                    used.add(friend['id'])
-                            else:
-                                return
+                    used.add(str(resp['id']))
+                    friends = vk.friends.get(user_id=resp['id'])
+                    queue.extend(friends['items'])
             else:
                 return
+        while time.time() - start_time < time_limit and len(people) < 200:
+            current = str(queue.pop(0))
+            current_info = vk.users.get(user_ids=current, fields='is_closed')
+            if not (current in used) and not ('deactivated' in current_info[0]) and not(current_info[0]['is_closed']):
+                current_person = dict()
+                current_person['id'] = current
+                current_person['last_name'] = current_info[0]['last_name']
+                current_person['first_name'] = current_info[0]['first_name']
+                current_person['groups'] = vk.groups.get(user_id=current, extended=1, count=200)['items']
+                people.append(current_person)
+                used.add(current)
+        return
     else:
         return
 
@@ -212,3 +211,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
