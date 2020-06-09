@@ -32,7 +32,7 @@ def draw_social_graph():
     friend_list1 = []
     for friend1 in GG.nodes[target]["friends"]:
         counter1 += 1
-        if(counter1 <= 200):
+        if counter1 <= 100:
             sub_dict = {"id": G.nodes[friend1].setdefault("id", friend1),
                         "first_name": G.nodes[friend1].setdefault("first_name", "?"),
                         "last_name": G.nodes[friend1].setdefault("last_name", "?"),
@@ -51,7 +51,7 @@ def draw_social_graph():
                     GG.add_edge(friend1, friend2)
                 else:
                     counter2 += 1
-                if (counter2 <= 30):
+                if counter2 <= 30:
                     sub_dict = {"id": G.nodes[friend2].setdefault("id", friend2),
                                 "first_name": G.nodes[friend2].setdefault("first_name", "?"),
                                 "last_name": G.nodes[friend2].setdefault("last_name", "?"),
@@ -75,22 +75,17 @@ def draw_social_graph():
     nx.draw_networkx_labels(GG, pos=pos, labels=labels, font_size=6)
     #
     nx.draw_networkx_nodes(GG, pos, nodelist=GG.nodes[target]["friends"], label=[labels[target]], node_color='r', node_size=55)
+    nx.draw_networkx_nodes(GG, pos, nodelist=[target], label=[labels[target]], node_color='#FFFC00', node_size=200)  #neon yellow
     #
-    def highlight(num):  # animation function
-        if num%2==0:
-            nx.draw_networkx_nodes(GG, pos, nodelist=[target], label=[labels[target]], node_color='#FFFC00', node_size=200)  #neon yellow
-        else:
-            nx.draw_networkx_nodes(GG, pos, nodelist=[target], label=[labels[target]], node_color='#F9FFDD', node_size=200)  #light yellow
-
-    ani = matplotlib.animation.FuncAnimation(fig, highlight, frames=2, interval=100,
-                                             repeat=True)  # repeat=True
-    mng = plt.get_current_fig_manager()
-    mng.window.state("zoomed")
+    fig.set_size_inches(16, 9)  # set figure's size manually to your full screen (32x18)
     fig.tight_layout()  # маленькие отступы
     red_patch = mpatches.Patch(color='red', label='друзья первого уровня')
     blue_patch = mpatches.Patch(label='друзья второго уровня') #default blue color
     plt.legend(handles=[red_patch, blue_patch])
-    plt.show()
+    plt.savefig('friends.png',bbox_inches = "tight")
+    html = '<img src=\'friends.png\'>'
+    with open('friends.html', 'w') as f:
+        f.write(html)
 
 def draw_social_path():
     path = 'way.json'
@@ -107,7 +102,7 @@ def draw_social_path():
         for friend in person["friends"]:
             G.add_edge(person["id"], friend)
 
-    print(social_path)
+    # print(social_path)
     GG = nx.Graph()
     for point in social_path[0:len(social_path)]:
         sub_dict = {"id": G.nodes[point]["id"], "first_name": G.nodes[point]["first_name"],
@@ -118,8 +113,18 @@ def draw_social_path():
         if i!=0:
             GG.add_edge(social_path[i],social_path[i-1])
         for friend in GG.nodes[social_path[i]]["friends"]:
+
+            if G.degree[friend]>1 and counter < 40:
+                counter += 1
+                sub_dict = {"id": G.nodes[friend].setdefault("id", friend),
+                            "first_name": G.nodes[friend].setdefault("first_name", "?"),
+                            "last_name": G.nodes[friend].setdefault("last_name", "?"),
+                            "friends": G.nodes[friend].setdefault("friends", [])}
+                GG.add_node(sub_dict["id"], **sub_dict)
+                GG.add_edge(social_path[i], friend)
+        for friend in GG.nodes[social_path[i]]["friends"]:
             counter += 1
-            if (counter < 20):
+            if (counter < 40):
                 sub_dict = {"id": G.nodes[friend].setdefault("id", friend),
                             "first_name": G.nodes[friend].setdefault("first_name", "?"),
                             "last_name": G.nodes[friend].setdefault("last_name", "?"),
@@ -129,40 +134,47 @@ def draw_social_path():
     pos = nx.spring_layout(GG)
     labels = {}
     for node in GG.nodes():
-        labels[node] = GG.nodes[node]["id"]  # short labels
-    for point in social_path:
-        labels[point] = GG.nodes[point]["last_name"] + ' ' + GG.nodes[point]["first_name"]  # long labels
+        if node not in social_path:
+            labels[node] = GG.nodes[node]["id"]  # short labels
+    # for point in social_path:
+    #     labels[point] = GG.nodes[point]["last_name"] + ' ' + GG.nodes[point]["first_name"]  # long labels
     # fig, ax = plt.subplots()
     fig = plt.figure()
+    fig.set_size_inches(16, 9)  # set figure's size manually to your full screen (32x18)
     fig.canvas.set_window_title('way graph')
     fig.suptitle('Путь от пользователя ' + GG.nodes[social_path[0]]["last_name"] + ' ' + GG.nodes[social_path[0]]["first_name"] +
-                 ' к пользователю ' + GG.nodes[social_path[-1]]["last_name"] + ' ' + GG.nodes[social_path[-1]]["first_name"]+'\n(длина - '+str(len(social_path))+' человека)', fontsize=13)
+                 ' к пользователю ' + GG.nodes[social_path[-1]]["last_name"] + ' ' + GG.nodes[social_path[-1]]["first_name"]+' (длина - '+str(len(social_path))+' человека)', fontsize=13)
     limits = plt.axis('off')
-
-    def update_path(num):  # animation function
-        hightlight = social_path[0:num]
-        nx.draw_networkx_edges(GG, pos=pos, labels=labels, edge_color='grey',style="solid")#, alpha=0.6
-        nx.draw_networkx_nodes(GG, pos=pos, node_size=400, node_shape='*', node_color='#FFA500',edgecolors='grey') #, linewidths = 0.5
-        nx.draw_networkx_labels(GG, pos=pos, labels=labels, font_size=7)
-        edge_list = []
-        for i in range(0, len(hightlight) - 1):
-            edge_list.append((hightlight[i], hightlight[i + 1]))
-        nx.draw_networkx_edges(G, pos=pos, edgelist=edge_list,
+    nx.draw_networkx_edges(GG, pos=pos, labels=labels, edge_color='grey', style="solid")  # , alpha=0.6
+    nx.draw_networkx_nodes(GG, pos=pos, node_size=100, node_color='#FFA500')  # , linewidths = 0.5
+    nx.draw_networkx_labels(GG, pos=pos, labels=labels, font_size=7)
+    path_labels={}
+    for point in social_path:
+        path_labels[point]=GG.nodes[point]["last_name"] + ' ' + GG.nodes[point]["first_name"]
+    nx.draw_networkx_labels(GG, pos=pos, labels=path_labels, font_size=7, font_weight="bold")
+    edge_list = []
+    for i in range(0, len(social_path) - 1):
+            edge_list.append((social_path[i], social_path[i + 1]))
+    nx.draw_networkx_edges(G, pos=pos, edgelist=edge_list,
                                edge_color='r', style="solid")
-        nx.draw_networkx_nodes(GG, pos=pos, nodelist=hightlight, node_size=400, node_color='r', node_shape='*')  #(4,0,0),edgecolors='grey'
+    nx.draw_networkx_nodes(GG, pos=pos, nodelist=social_path, node_size=400, node_color='r', node_shape='*')  #(4,0,0),edgecolors='grey'
 
-    ani = matplotlib.animation.FuncAnimation(fig, update_path, frames=len(social_path) + 1, interval=300,
-                                             repeat=True)  # repeat=True
 
-    mng = plt.get_current_fig_manager()
-    mng.window.state("zoomed")
     fig.tight_layout()  # маленькие отступы
-    plt.show()
+    # plt.show()
+    plt.savefig('way.png', bbox_inches="tight")
+
+    html = '<img src=\'way.png\'>'
+
+    with open('way.html', 'w') as f:
+        f.write(html)
 
 def draw_social_groups():
     # data file
     path = 'groups.json'
     G = nx.Graph()
+    people_list=[]
+    groups_list=[]
     with open(path, 'r', encoding='UTF8') as f:
         data = json.loads(f.read())
     for person in data:
@@ -174,10 +186,12 @@ def draw_social_groups():
     for node in G.nodes():
         # print(G.degree[node])
         # print(G.nodes[node]['bipartite'])
-        if G.nodes[node]['bipartite']==1 and G.degree[node]>8:#2 is optional
+        if G.nodes[node]['bipartite']==1 and G.degree[node]>10:#2 is optional
             for person in G[node]:
                 GG.add_node(person,**G.nodes[person])
+                people_list.append(person)
             GG.add_node(node,**G.nodes[node])
+            groups_list.append(node)
             GG.add_edges_from(G.edges(node))
     labels={}
     for node in GG.nodes():
@@ -185,11 +199,16 @@ def draw_social_groups():
             labels[node]=G.nodes[node]["last_name"]+' '+G.nodes[node]["first_name"]
         else:
             labels[node]=G.nodes[node]["name"]
-    rating=''
+    table=[]
     for group in GG.nodes():
-        if GG.nodes[group]['bipartite'] == 1 and G.degree[node] > 8:
-            print()
-              # сделать словарь? + сортировку + в строку
+        if GG.nodes[group]['bipartite'] == 1 and G.degree[group] > 10:
+            table.append([GG.nodes[group]['name'],G.degree[group]])
+    print(table)
+    for i in range(0,len(table)-1):
+        for j in range(i,len(table)-1):
+            if table[i][1]<table[j][1]:
+                table[i],table[j]=table[j],table[i]
+    print(table)
     l, r = nx.bipartite.sets(GG)
     pos = {}
 
@@ -198,27 +217,33 @@ def draw_social_groups():
     pos.update((node, (2, index)) for index, node in enumerate(r))
 
     fig = plt.figure()
-    ax=plt.subplot()
+    ax = plt.subplot()
+
+    fig.suptitle('Топ сообществ, пабликов и подписок среди друзей пользователя '+data[0]["last_name"]+' '+data[0]['first_name'], fontsize=13)
     limits = plt.axis('off')
     # pos=nx.bipartite_layout(GG, nodes=GG.nodes())
-    nx.draw_networkx_nodes(GG, pos=pos, node_size=100)
-    nx.draw_networkx_labels(GG, pos=pos, labels=labels,font_size=7)
-    nx.draw_networkx_edges(GG, pos=pos, edge_color='grey', alpha=0.5)
-    plt.legend(labels=['1','2'])
-    # plt.text(1,0.5,'cnfnbcnbrf\nthn\ntrfgbhyn\ntrtbynumytrb\nrbtfyugtfrtgy\n')
-    ax.text(.8,.8,'rotaыавОted   score\nwith newlines(8)\nynrjmnujmynuh(9)\nrynjumtk\nhrynjmutk\nthynrjmuk\nbhrtnyjtmuk\nebthrynjmu\nbgthrynjtum\ngbthynrjmu\nrgbtehnryjmu\nrgbthrynujm\n',
-            fontsize=7)
-    # nx.draw(GG, pos=pos, labels=labels)
-    mng = plt.get_current_fig_manager()
-    mng.window.state("zoomed")
+    nx.draw_networkx_nodes(GG, pos=pos, ax=ax,nodelist=people_list,node_color='#3CB371', node_size=100)
+    nx.draw_networkx_nodes(GG, pos=pos, ax=ax,nodelist=groups_list,node_color='#DDA0DD', node_size=100)
+    nx.draw_networkx_labels(GG, pos=pos,ax=ax, labels=labels, font_size=7)
+    nx.draw_networkx_edges(GG, pos=pos, ax=ax,edge_color='grey', alpha=0.5)
+    fig.set_size_inches(16,9)  # set figure's size manually to your full screen (32x18)
+    plt.legend(labels=['пользователи','сообщества, паблики и подписки'])
+    # bx=plt.subplot()
+    ax.table(cellText=table, colLabels=['название','сколько друзей подписано'], loc='bottom')
+
     fig.tight_layout()  # маленькие отступы
-    plt.show()
+    plt.savefig('groups.png', bbox_inches="tight")
+
+    html = '<img src=\'groups.png\'>'
+
+    with open('groups.html', 'w') as f:
+        f.write(html)
 
 # option = int(input())
 # 1 social graph
 # 2 social path
 # 3 group
-option = 1
+option = 3
 if (option == 1):
     draw_social_graph()
 elif (option==2):
