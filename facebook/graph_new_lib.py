@@ -17,8 +17,8 @@ font_style = {'fontname': 'Bookman Old Style'}
 
 net = Network(height="750px", width="100%", bgcolor="#222222", font_color="white")
 net.barnes_hut()  # растановка nodes
-# table = pd.read_csv('C:\KURSACH\File_CSV.csv')
-file_name = 'File_CSV.csv'  # ПЕРЕИМЕНОВАТЬ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+file_name = 'Friends_DF.csv'  # ПЕРЕИМЕНОВАТЬ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 f = os.path.abspath(file_name)
 table = pd.read_csv(f)
 
@@ -29,7 +29,7 @@ USER = table['name'][0]
 
 def show_graph():
     net.show("facebook_net.html")
-    plt.axis('off')  # hide the axes   
+    plt.axis('off')  # hide the axes
     mpld3.show()
 
 
@@ -390,9 +390,8 @@ def draw_connection(path):
 
 
 def find_common_friends_between_friends():
-    # with open('C:' + os.sep + 'KURSACH' + os.sep + 'my_dict.json', 'r', encoding='utf-8') as f:  # ПЕРЕДЕЛАТЬ!!!!!!!!!!!
-    file_name = 'my_dict.json'  # ПЕРЕИМЕНОВАТЬ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    with open(os.path.abspath(file_name), 'r', encoding='utf-8') as f:  # ПЕРЕДЕЛАТЬ !!!!!!!!!
+    file_name = 'friends.json'
+    with open(os.path.abspath(file_name), 'r', encoding='utf-8') as f:
         data = json.loads(f.read())
 
         arr_sets = []
@@ -411,8 +410,9 @@ def find_common_friends_between_friends():
             else:
                 _fr_1 = one_dict['friends_list']
                 friends_1 = _fr_1['friends']
-                fr_set_1 = set(friends_1)
-                arr_sets.append(fr_set_1)  # set друзей добавляется в list
+                if friends_1:
+                    fr_set_1 = set(friends_1)
+                    arr_sets.append(fr_set_1)  # set друзей добавляется в list
 
         for i in range(0, len(arr_sets)):
             for j in range(i + 1, len(arr_sets) - 1):
@@ -494,10 +494,8 @@ def draw_common_friends_between_friends(common_fr_between_fr):
 
 
 def find_groups():
-    # with open('C:' + os.sep + 'KURSACH' + os.sep + 'my_dict.json', 'r', encoding='utf-8') as f:  # ПЕРЕДЕЛАТЬ !!!!!!!!!
-
-    file_name = 'my_dict.json'  # ПЕРЕИМЕНОВАТЬ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    with open(os.path.abspath(file_name), 'r', encoding='utf-8') as f:  # ПЕРЕДЕЛАТЬ !!!!!!!!!
+    file_name = 'friends.json'
+    with open(os.path.abspath(file_name), 'r', encoding='utf-8') as f:
         data = json.loads(f.read())
 
         arr_sets = []
@@ -515,8 +513,9 @@ def find_groups():
             else:
                 _fr_1 = one_dict['friends_list']
                 friends_1 = _fr_1['friends']
-                fr_set_1 = set(friends_1)
-                arr_sets.append(fr_set_1)  # set друзей добавляется в list
+                if friends_1:
+                    fr_set_1 = set(friends_1)
+                    arr_sets.append(fr_set_1)  # set друзей добавляется в list
 
         set_interaction = set()  # ТОЛЬКО ИЗ ДР 1ОГО УРОВНЯ
         for i in range(0, len(arr_sets)):
@@ -621,6 +620,7 @@ def draw_groups(groups):
 
 def main():
     create_graph()
+    # net.show("facebook_net.html")
     # show_graph()
 
     #                  ВЫЗОВЫ
@@ -653,10 +653,10 @@ def main():
     # draw_connection(path)
 
     #                      FIND COMMON FRIENDS
-    common_fr_between_fr = find_common_friends_between_friends()
+    # common_fr_between_fr = find_common_friends_between_friends()
 
     #                      DRAW COMMON FRIENDS
-    draw_common_friends_between_friends(common_fr_between_fr)
+    # draw_common_friends_between_friends(common_fr_between_fr)
 
     #                      FIND GROUPS
     # groups = find_groups()
