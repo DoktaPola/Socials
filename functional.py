@@ -8,14 +8,22 @@ import matplotlib.patches as mpatches
 def draw_social_graph():
     path = 'friends.json'  # data file
     G = nx.Graph()
-    with open(path, 'r') as f:
+    with open(path, 'r', encoding='UTF8') as f:
         data = json.loads(f.read())
     # data is read list of dictionaries
 
     # limits (can be variable for different data sizes); set for better visualisation
-    first_level_limit = 70
+    first_level_limit = 150
     second_level_limits = 30
-
+    # default node sizes
+    node_size_2lvl = 10
+    node_size_1lvl = 55
+    node_size_target = 200
+    # if tiny data
+    if len(data[0]["friends"]) < 20:
+        node_size_2lvl = 400
+        node_size_1lvl = 800
+        node_size_target = 1000
     for person in data:
         G.add_node(person["id"], **person)
 
@@ -32,9 +40,9 @@ def draw_social_graph():
                 "last_name": G.nodes[target].setdefault("last_name", "?"),
                 "friends": G.nodes[target].setdefault("friends", [])}
     GG.add_node(sub_dict["id"], **sub_dict)
-    counter1 = 0
     friend_list1 = []  # list of edges with 1st level friends
-
+    target_friends = []  # list of ids of target's friends to draw
+    counter1 = 0
     for friend1 in GG.nodes[target]["friends"]:
         counter1 += 1  # counter of 1st level friends
         if counter1 <= first_level_limit:  # limit of friends to draw
@@ -45,6 +53,7 @@ def draw_social_graph():
             GG.add_node(sub_dict["id"], **sub_dict)
             GG.add_edge(target, friend1)
             friend_list1.append((friend1, target))  # add edge to list
+            target_friends.append(friend1)
             counter2 = 0  # counter of 2nd level friends
             for friend2 in GG.nodes[friend1]["friends"]:
                 if friend2 in GG.nodes[target]['friends']:
@@ -54,6 +63,7 @@ def draw_social_graph():
                                 "friends": G.nodes[friend2].setdefault("friends", [])}
                     GG.add_node(sub_dict["id"], **sub_dict)
                     GG.add_edge(friend1, friend2)
+                    GG.add_edge(target,friend2)
                 else:
                     counter2 += 1
                 if counter2 <= second_level_limits:  # limit for friends to draw
@@ -63,6 +73,10 @@ def draw_social_graph():
                                 "friends": G.nodes[friend2].setdefault("friends", [])}
                     GG.add_node(sub_dict["id"], **sub_dict)
                     GG.add_edge(friend1, friend2)
+                else:
+                    break
+        else:
+            break
     fig = plt.figure()
     fig.canvas.set_window_title('social graph')
     fig.suptitle('Граф дружбы пользователя ' + GG.nodes[target]["last_name"] + ' ' + GG.nodes[target]["first_name"]
@@ -78,12 +92,12 @@ def draw_social_graph():
     # drawing process
     nx.draw_networkx_edges(GG, pos=pos, labels=labels, edge_color='grey', alpha= 0.2)  # draw all the edges
     nx.draw_networkx_edges(GG, pos=pos, edge_color='grey', edgelist=friend_list1)  # draw edges with 1st level friends
-    nx.draw_networkx_nodes(GG, pos=pos, node_size=10)  # draw all nodes
+    nx.draw_networkx_nodes(GG, pos=pos, node_size=node_size_2lvl)  # draw all nodes
     nx.draw_networkx_labels(GG, pos=pos, labels=labels, font_size=6)  # draw labels
-    nx.draw_networkx_nodes(GG, pos, nodelist=GG.nodes[target]["friends"], label=[labels[target]], node_color='r',
-                           node_size=55)  # draw nodes of 1st level friends red
+    nx.draw_networkx_nodes(GG, pos, nodelist=target_friends, label=[labels[target]], node_color='r',
+                           node_size=node_size_1lvl)  # draw nodes of 1st level friends red
     nx.draw_networkx_nodes(GG, pos, nodelist=[target], label=[labels[target]], node_color='#FFFC00',
-                           node_size=200)  # neon yellow draw target
+                           node_size=node_size_target)  # neon yellow draw target
     #
     fig.set_size_inches(16, 9)  # set figure's size
     fig.tight_layout()  # маленькие отступы
@@ -92,6 +106,7 @@ def draw_social_graph():
     plt.legend(handles=[red_patch, blue_patch])  # add graph legend
     # output files: friends.png and friends.html
     plt.savefig('friends.png', bbox_inches="tight")
+
     html = '<img src=\'friends.png\'>'
     with open('friends.html', 'w') as f:
         f.write(html)
@@ -100,7 +115,7 @@ def draw_social_graph():
 def draw_social_path():
     path = 'way.json'  # data file
     G = nx.Graph()
-    with open(path, 'r') as f:
+    with open(path, 'r', encoding='UTF8') as f:
         data = json.loads(f.read())
     # data is read list of dictionaries
 
@@ -123,6 +138,7 @@ def draw_social_path():
                     "last_name": G.nodes[point]["last_name"], "friends": G.nodes[point]["friends"]}
         GG.add_node(sub_dict["id"], **sub_dict)
 
+    level_limit = 40
     for i in range(0, len(social_path)):
         counter = 0  # number of friends for one person to draw
         if i != 0:
@@ -271,7 +287,7 @@ def draw_social_groups():
 # 1 social graph
 # 2 social path
 # 3 group
-option = 3
+option = 1
 if option == 1:
     draw_social_graph()
 elif option == 2:
