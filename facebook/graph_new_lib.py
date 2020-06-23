@@ -16,9 +16,9 @@ plt.style.use('dark_background')  # темный фон
 font_style = {'fontname': 'Bookman Old Style'}
 
 net = Network(height="750px", width="100%", bgcolor="#222222", font_color="white")
-net.barnes_hut()  # растановка nodes
 
-file_name = 'Friends_DF.csv'  # ПЕРЕИМЕНОВАТЬ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# file_name = 'Friends_DF.csv'
+file_name = 'File_CSV.csv'
 f = os.path.abspath(file_name)
 table = pd.read_csv(f)
 
@@ -26,6 +26,10 @@ row_count = len(table['name'])  # сколько строчек
 TIME_LIMIT = 60
 USER = table['name'][0]
 
+if row_count > 1500:
+    net.force_atlas_2based(gravity=-1000)
+else:
+    net.barnes_hut()  # растановка nodes
 
 def show_graph():
     net.show("facebook_net.html")
@@ -102,7 +106,9 @@ def create_graph():
                     node['size'] = s + 40
         else:
             continue
-
+    # LEGEND
+    plt.text(0.05, 0.8, 'Hello!', color='yellow', size=20, weight='normal', **font_style)
+    plt.text(0.05, 0.75, 'This is your Facebook network!', color='white', size=16, weight='light', **font_style)
 
 ###################################################################
 #                      Network Analysis
@@ -642,27 +648,27 @@ def main():
     # find_by_info('b-day', '1995')  # год
 
     #                      FIND PATH
-    # friends_queue = deque()  # !!!!
-    # FB = _create_graph()   # !!!!
+    friends_queue = deque()  # !!!!
+    FB = _create_graph()   # !!!!
 
     # path = find_connection(FB, 'Полина Ожиганова', 'Katerina Tyulina', friends_queue)  # path exists
     # path = find_connection(FB, 'Полина Ожиганова', 'Олег Паканин', friends_queue)  # path exists
     # path = find_connection(FB, 'Полина Ожиганова', 'Гарри Поттер', friends_queue)  # path DOESN'T exist
-    # path = find_connection(FB, 'Tanya Termeneva', 'Елена Рогожина', friends_queue)  # path exists
+    path = find_connection(FB, 'Tanya Termeneva', 'Елена Рогожина', friends_queue)  # path exists
     #                      DRAW PATH
-    # draw_connection(path)
+    draw_connection(path)
 
     #                      FIND COMMON FRIENDS
-    # common_fr_between_fr = find_common_friends_between_friends()
+    #common_fr_between_fr = find_common_friends_between_friends()
 
     #                      DRAW COMMON FRIENDS
-    # draw_common_friends_between_friends(common_fr_between_fr)
+    #draw_common_friends_between_friends(common_fr_between_fr)
 
     #                      FIND GROUPS
-    # groups = find_groups()
+    #groups = find_groups()
 
     #                      DRAW GROUPS
-    # draw_groups(groups)
+    #draw_groups(groups)
 
 
 if __name__ == '__main__':
