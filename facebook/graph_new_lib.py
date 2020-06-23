@@ -4,6 +4,7 @@ import random
 import re
 import time
 from collections import deque
+from os.path import abspath
 
 import matplotlib.pyplot as plt, mpld3
 import networkx as nx
@@ -15,20 +16,25 @@ plt.style.use('dark_background')  # темный фон
 font_style = {'fontname': 'Bookman Old Style'}
 
 net = Network(height="750px", width="100%", bgcolor="#222222", font_color="white")
-net.barnes_hut()  # растановка nodes
-# table = pd.read_csv('C:\KURSACH\File_CSV.csv')
-table = pd.read_csv('D:\KURSACH\File_CSV.csv')
+
+# file_name = 'Friends_DF.csv'
+file_name = 'File_CSV.csv'
+f = os.path.abspath(file_name)
+table = pd.read_csv(f)
 
 row_count = len(table['name'])  # сколько строчек
 TIME_LIMIT = 60
 USER = table['name'][0]
 
+if row_count > 1500:
+    net.force_atlas_2based(gravity=-1000)
+else:
+    net.barnes_hut()  # растановка nodes
 
 def show_graph():
     net.show("facebook_net.html")
-    plt.axis('off')  # hide the axes       #####################
-    # plt.show()  ###################
-    mpld3.show()  ###################
+    plt.axis('off')  # hide the axes
+    mpld3.show()
 
 
 def create_graph():
@@ -100,7 +106,9 @@ def create_graph():
                     node['size'] = s + 40
         else:
             continue
-
+    # LEGEND
+    plt.text(0.05, 0.8, 'Hello!', color='yellow', size=20, weight='normal', **font_style)
+    plt.text(0.05, 0.75, 'This is your Facebook network!', color='white', size=16, weight='light', **font_style)
 
 ###################################################################
 #                      Network Analysis
@@ -388,8 +396,8 @@ def draw_connection(path):
 
 
 def find_common_friends_between_friends():
-    # with open('C:' + os.sep + 'KURSACH' + os.sep + 'my_dict.json', 'r', encoding='utf-8') as f:  # ПЕРЕДЕЛАТЬ!!!!!!!!!!!
-    with open('D:' + os.sep + 'KURSACH' + os.sep + 'my_dict.json', 'r', encoding='utf-8') as f:  # ПЕРЕДЕЛАТЬ!!!!!!!!!!!
+    file_name = 'friends.json'
+    with open(os.path.abspath(file_name), 'r', encoding='utf-8') as f:
         data = json.loads(f.read())
 
         arr_sets = []
@@ -408,8 +416,9 @@ def find_common_friends_between_friends():
             else:
                 _fr_1 = one_dict['friends_list']
                 friends_1 = _fr_1['friends']
-                fr_set_1 = set(friends_1)
-                arr_sets.append(fr_set_1)  # set друзей добавляется в list
+                if friends_1:
+                    fr_set_1 = set(friends_1)
+                    arr_sets.append(fr_set_1)  # set друзей добавляется в list
 
         for i in range(0, len(arr_sets)):
             for j in range(i + 1, len(arr_sets) - 1):
@@ -491,8 +500,8 @@ def draw_common_friends_between_friends(common_fr_between_fr):
 
 
 def find_groups():
-    # with open('C:' + os.sep + 'KURSACH' + os.sep + 'my_dict.json', 'r', encoding='utf-8') as f:  # ПЕРЕДЕЛАТЬ !!!!!!!!!
-    with open('D:' + os.sep + 'KURSACH' + os.sep + 'my_dict.json', 'r', encoding='utf-8') as f:  # ПЕРЕДЕЛАТЬ !!!!!!!!!
+    file_name = 'friends.json'
+    with open(os.path.abspath(file_name), 'r', encoding='utf-8') as f:
         data = json.loads(f.read())
 
         arr_sets = []
@@ -510,8 +519,9 @@ def find_groups():
             else:
                 _fr_1 = one_dict['friends_list']
                 friends_1 = _fr_1['friends']
-                fr_set_1 = set(friends_1)
-                arr_sets.append(fr_set_1)  # set друзей добавляется в list
+                if friends_1:
+                    fr_set_1 = set(friends_1)
+                    arr_sets.append(fr_set_1)  # set друзей добавляется в list
 
         set_interaction = set()  # ТОЛЬКО ИЗ ДР 1ОГО УРОВНЯ
         for i in range(0, len(arr_sets)):
@@ -616,10 +626,11 @@ def draw_groups(groups):
 
 def main():
     create_graph()
+    # net.show("facebook_net.html")
     # show_graph()
 
     #                  ВЫЗОВЫ
-    find_by_info('study', 'НИУ ВШЭ')  # существующий вуз
+    # find_by_info('study', 'НИУ ВШЭ')  # существующий вуз
     # find_by_info('study', 'ВШЭ')  # существующий вуз + regex
     # find_by_info('study', 'вшэ')  # существующий вуз + regex
     # find_by_info('study', 'lol')  # нет вуза такого
@@ -637,27 +648,27 @@ def main():
     # find_by_info('b-day', '1995')  # год
 
     #                      FIND PATH
-    # friends_queue = deque()  # !!!!
-    # FB = _create_graph()   # !!!!
+    friends_queue = deque()  # !!!!
+    FB = _create_graph()   # !!!!
 
     # path = find_connection(FB, 'Полина Ожиганова', 'Katerina Tyulina', friends_queue)  # path exists
     # path = find_connection(FB, 'Полина Ожиганова', 'Олег Паканин', friends_queue)  # path exists
     # path = find_connection(FB, 'Полина Ожиганова', 'Гарри Поттер', friends_queue)  # path DOESN'T exist
-    # path = find_connection(FB, 'Tanya Termeneva', 'Елена Рогожина', friends_queue)  # path exists
+    path = find_connection(FB, 'Tanya Termeneva', 'Елена Рогожина', friends_queue)  # path exists
     #                      DRAW PATH
-    # draw_connection(path)
+    draw_connection(path)
 
     #                      FIND COMMON FRIENDS
-    # common_fr_between_fr = find_common_friends_between_friends()
+    #common_fr_between_fr = find_common_friends_between_friends()
 
     #                      DRAW COMMON FRIENDS
-    # draw_common_friends_between_friends(common_fr_between_fr)
+    #draw_common_friends_between_friends(common_fr_between_fr)
 
     #                      FIND GROUPS
-    # groups = find_groups()
+    #groups = find_groups()
 
     #                      DRAW GROUPS
-    # draw_groups(groups)
+    #draw_groups(groups)
 
 
 if __name__ == '__main__':
