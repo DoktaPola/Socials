@@ -72,7 +72,8 @@ Then you will have many options to work with the collecting data.
 
 ### Guide
 
-**[How to work with...](https://drive.google.com/file/d/1uZEY3GyFS69tKOcNRcVyPe8VMq-PjWiS/view?usp=sharing) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**4
+**[How to work with...](https://drive.google.com/file/d/1uZEY3GyFS69tKOcNRcVyPe8VMq-PjWiS/view?usp=sharing) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**
+
 Here you can find instraction and examples of work.
 
 
@@ -81,10 +82,10 @@ Here you can find instraction and examples of work.
 
 This project exists thanks to all the people who contribute. 
 <a href="https://github.com/DoktaPola/Socials/graphs/contributors">
-<img src="https://avatars2.githubusercontent.com/u/44429468?s=460&u=4b37cd2315aaf9fd9fcfc101cc26416464ee8bf1&v=4" />
-<img src="https://avatars3.githubusercontent.com/u/63115848?s=460&u=c41e9e8fc2822c46d396880906687fe89f5e07d9&v=4" />
-<img src="https://avatars2.githubusercontent.com/u/61208923?s=460&v=4" />
-<img src="https://avatars3.githubusercontent.com/u/55359172?s=460&u=89ab963abf753c0f28b39a7c9dd51b4774f9e4fb&v=4" /></a>
+<img style="height:auto;" alt="" width="260" height="260" class="avatar avatar-user width-full border bg-white" src="https://avatars2.githubusercontent.com/u/44429468?s=460&amp;u=4b37cd2315aaf9fd9fcfc101cc26416464ee8bf1&amp;v=4" />
+<img style="height:auto;" alt="" width="260" height="260" class="avatar avatar-user width-full border bg-white" src="https://avatars3.githubusercontent.com/u/63115848?s=460&amp;u=c41e9e8fc2822c46d396880906687fe89f5e07d9&amp;v=4" />
+<img style="height:auto;" alt="" width="260" height="260" class="avatar avatar-user width-full border bg-white" src="https://avatars2.githubusercontent.com/u/61208923?s=460&amp;v=4" />
+<img style="height:auto;" alt="" width="260" height="260" class="avatar avatar-user width-full border bg-white" src="https://avatars3.githubusercontent.com/u/55359172?s=460&amp;u=89ab963abf753c0f28b39a7c9dd51b4774f9e4fb&amp;v=4" /></a>
 
 ---
 
