@@ -58,9 +58,9 @@ __Important:__ depending on your system, make sure to use `pip3` and `python3` i
 To run app, you'll need to run the **[file](https://github.com/DoktaPola/Socials/blob/master/main_design.py)** script you've just downloaded.
 
 App has 2 modes:
-	Facebook mod
-	VKontakte mod
-You can put in your account details now by passing the username and password parameters to the <br>special form</br>, like so: 
+	*Facebook mod
+	*VKontakte mod
+You can put in your account details now by passing the username and password parameters to the **special form**, like so: 
 ```python
 username="abcd", 
 password="1234"
@@ -82,10 +82,10 @@ Here you can find instraction and examples of work.
 
 This project exists thanks to all the people who contribute. 
 <a href="https://github.com/DoktaPola/Socials/graphs/contributors">
-<img style="height:auto;" alt="" width="260" height="260" class="avatar avatar-user width-full border bg-white" src="https://avatars2.githubusercontent.com/u/44429468?s=460&amp;u=4b37cd2315aaf9fd9fcfc101cc26416464ee8bf1&amp;v=4" />
-<img style="height:auto;" alt="" width="260" height="260" class="avatar avatar-user width-full border bg-white" src="https://avatars3.githubusercontent.com/u/63115848?s=460&amp;u=c41e9e8fc2822c46d396880906687fe89f5e07d9&amp;v=4" />
-<img style="height:auto;" alt="" width="260" height="260" class="avatar avatar-user width-full border bg-white" src="https://avatars2.githubusercontent.com/u/61208923?s=460&amp;v=4" />
-<img style="height:auto;" alt="" width="260" height="260" class="avatar avatar-user width-full border bg-white" src="https://avatars3.githubusercontent.com/u/55359172?s=460&amp;u=89ab963abf753c0f28b39a7c9dd51b4774f9e4fb&amp;v=4" /></a>
+<img style="height:auto;" alt="Avatar" width="50" height="50" class="avatar avatar-user width-full border bg-white" src="https://avatars2.githubusercontent.com/u/44429468?s=460&amp;u=4b37cd2315aaf9fd9fcfc101cc26416464ee8bf1&amp;v=4" />
+<img style="height:auto;" alt="Avatar" width="50" height="50" class="avatar avatar-user width-full border bg-white" src="https://avatars3.githubusercontent.com/u/63115848?s=460&amp;u=c41e9e8fc2822c46d396880906687fe89f5e07d9&amp;v=4" />
+<img style="height:auto;" alt="Avatar" width="50" height="50" class="avatar avatar-user width-full border bg-white" src="https://avatars2.githubusercontent.com/u/61208923?s=460&amp;v=4" />
+<img style="height:auto;" alt="Avatar" width="50" height="50" class="avatar avatar-user width-full border bg-white" src="https://avatars3.githubusercontent.com/u/55359172?s=460&amp;u=89ab963abf753c0f28b39a7c9dd51b4774f9e4fb&amp;v=4" /></a>
 
 ---
 
