@@ -287,10 +287,11 @@ def draw_social_groups():
 # 1 social graph
 # 2 social path
 # 3 group
-option = 1
-if option == 1:
-    draw_social_graph()
-elif option == 2:
-    draw_social_path()
-elif option == 3:
-    draw_social_groups()
+def main(option):
+    if (option == 1):
+        draw_social_graph()
+    elif (option==2):
+        draw_social_path()
+    elif(option==3):
+        draw_social_groups()
+
