@@ -4,6 +4,7 @@ import design_final  # Это наш конвертированный файл �
 from PyQt5.QtCore    import QUrl
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QMessageBox, QApplication,QProgressBar
+
 import graph_new_lib
 import vk
 import functional
@@ -13,6 +14,20 @@ class Windowed_application(QtWidgets.QMainWindow, design_final.Ui_MainWindow):
         # и т.д. в файле design.py
         super().__init__()
         self.setupUi(self)  # Это нужно для инициализации нашего дизайна
+
+
+
+    def initUI(self):
+        self.pushButton_facebook_offer_friends_2.clicked.connect(self.facebook_group_search)
+        self.pushButton_facebook_offer_friends.clicked.connect(self.facebook_offers_friends)
+        self.pushButton__facebook_search.clicked.connect(self.facebook_search)
+        self.pushButton_facebook_find.clicked.connect(self.facebook_find_path)
+        if self.comboBox_vk.currentText() == "search for a social circle":
+            self.pushButton_vk_combo.clicked.connect(self.vk_search_social_circle)
+        else:
+            self.pushButton_vk_combo.clicked.connect(self. vk_grouping_func)
+        self.pushButton_vk_find_1.clicked.connect(self.vk_find_path)
+
 
     def facebook_group_search(self):
         graph_new_lib.draw_groups(graph_new_lib.find_groups())
@@ -78,12 +93,14 @@ class Windowed_application(QtWidgets.QMainWindow, design_final.Ui_MainWindow):
         functional.main(3)
         url = 'way.html'
         self.frame_3.load(QUrl(url))
- 
+    
+
+
 
 def main():
     graph_new_lib.create_graph()
-    app = QtWidgets.QApplication(sys.argv)  # Новый экземпляр QApplication
-    window = Windowed_application()  # Создаём объект класса ExampleApp
+    app = QtWidgets.QApplication(sys.argv) 
+    window = Windowed_application() 
     window.setWindowIcon(QIcon('orig.ico'))
     window.show()  # Показываем окно
     app.exec_()  # и запускаем приложение
