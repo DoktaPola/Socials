@@ -12,7 +12,7 @@ Implemented in Python.<p>
     <img src="https://img.shields.io/badge/build%20with-vk_api-ffff00.svg" />
     </a>
     <a href="https://github.com/SeleniumHQ/selenium">
-    <img src="https://img.shields.io/badge/built%20with-Selenium-yellow.svg" />
+    <img src="https://img.shields.io/badge/built%20with-Selenium-00FF00.svg" />
     </a>
     <a href="https://www.crummy.com/software/BeautifulSoup/bs4/doc/">
 	<img src="https://img.shields.io/badge/bulid with-bs4-ff1493.svg">
@@ -25,6 +25,9 @@ Implemented in Python.<p>
     </a>
 	<a href="https://pyvis.readthedocs.io/en/latest/">
 	<img src="https://img.shields.io/badge/bulid with-pyvis-8A2BE2.svg">
+    </a>
+	<a href="https://www.riverbankcomputing.com/static/Docs/PyQt5/">
+	<img src="https://img.shields.io/badge/bulid with-Pyqt5-FF8C00.svg">
     </a>
   </p>
 </p>
