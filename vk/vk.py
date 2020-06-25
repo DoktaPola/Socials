@@ -147,12 +147,12 @@ def findGroups(id, people, time_limit):
         return
 
 
-def main():
-    type = int(input())
+def main(type, user_id, count, time_limit, idStart, idFinale, id):
+
     if type == 1:
-        user_id = input()
-        count = int(input())
-        time_limit = int(input())
+        # user_id = input()
+        # count = int(input())
+        # time_limit = int(input())
         used = set()
         q = [user_id]
         friends = []
@@ -182,9 +182,9 @@ def main():
         f.write(json.dumps(friends, indent=4, ensure_ascii=False))
         f.close()
     elif type == 2:
-        idStart = input()
-        idFinale = input()
-        time_limit = int(input())
+        # idStart = input()
+        # idFinale = input()
+        # time_limit = int(input())
         used = set()
         ancestor = dict()
         way = []
@@ -200,8 +200,8 @@ def main():
             f.write(json.dumps(way, indent=4, ensure_ascii=False))
             f.close()
     elif type == 3:
-        id = input()
-        time_limit = int(input())
+        # id = input()
+        # time_limit = int(input())
         people = []
         findGroups(id, people, time_limit)
         f = open('groups.json', 'w', encoding="utf-8")
