@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://i.imgur.com/SPYT1zV.png" width="154">
   <h1 align="center">Socials</h1>
-  <p align="center">A desktop application that implements <b>search, analysis, and graphical display</b> of data 
+  <p align="center">A desktop application that implements <b>search, analysis, and graphical display</b> of data
   received from users of such social networks like <b>Facebook and Vkontakte</b>.
 Implemented in Python.<p>
   <p align="center">
@@ -19,7 +19,7 @@ Implemented in Python.<p>
     </a>
     <a href="https://matplotlib.org">
 	<img src="https://img.shields.io/badge/bulid with-matplotlib-7fffd4.svg">
-    </a>  
+    </a>
     <a href="https://networkx.github.io">
 	<img src="https://img.shields.io/badge/bulid with-networkx-ffc0cb.svg">
     </a>
@@ -56,7 +56,7 @@ pip install pyvis      (v0.1+)
 __Important:__ depending on your system, make sure to use `pip3` and `python3` instead.
 
 
-#### Running App
+#### Running
 
 To run app, you'll need to run the **[file](https://github.com/DoktaPola/Socials/blob/master/main_design.py)** script you've just downloaded.
 
@@ -64,9 +64,9 @@ App has 2 modes:
 - Facebook mod
 - VKontakte mod
 
-You can put in your account details now by passing the username and password parameters to the **special form**, like so: 
+You can put in your account details now by passing the username and password parameters to the **special form**, like so:
 ```python
-username="abcd", 
+username="abcd",
 password="1234"
 ```
 
@@ -81,9 +81,9 @@ Here you can find instraction and examples of work.
 
 
 
-### Contributors
+### Collaborators
 
-This project exists thanks to all the people who contribute. 
+This project exists thanks to all the people who contribute.
 <a href="https://github.com/DoktaPola/Socials/graphs/contributors" />
 
 <img style="height:auto;" alt="Avatar" width="50" height="50" class="avatar avatar-user width-full border bg-white" src="https://avatars2.githubusercontent.com/u/44429468?s=460&amp;u=4b37cd2315aaf9fd9fcfc101cc26416464ee8bf1&amp;v=4" />
