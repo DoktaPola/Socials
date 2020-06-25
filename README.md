@@ -58,8 +58,8 @@ __Important:__ depending on your system, make sure to use `pip3` and `python3` i
 To run app, you'll need to run the **[file](https://github.com/DoktaPola/Socials/blob/master/main_design.py)** script you've just downloaded.
 
 App has 2 modes:
-	- Facebook mod
-	- VKontakte mod
+	Facebook mod
+	VKontakte mod
 You can put in your account details now by passing the username and password parameters to the <br>special form</br>, like so: 
 ```python
 username="abcd", 
@@ -70,21 +70,21 @@ App will launch the corresponding parser and start working.
 Then you will have many options to work with the collecting data.
 
 
-## Guide
+### Guide
 
-**[How to work with...](https://drive.google.com/file/d/12rn-8bPJkTfnXceXXZGlLA_ZFmfkWjtV/view?usp=sharing) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**
+**[How to work with...](https://drive.google.com/file/d/1uZEY3GyFS69tKOcNRcVyPe8VMq-PjWiS/view?usp=sharing) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**4
+Here you can find instraction and examples of work.
 
-
-## Documentation
-A list of **all features** of InstaPy [can be found here](./DOCUMENTATION.md). 
 
 
 ### Contributors
 
 This project exists thanks to all the people who contribute. 
-<a href="https://github.com/DoktaPola/Socials/graphs/contributors"><img src="https://avatars0.githubusercontent.com/u/44429468?s=60&v=4" />
-<img src="https://avatars0.githubusercontent.com/u/61208923?s=60&v=4" />
-<img src="https://avatars1.githubusercontent.com/u/55359172?s=60&v=4" /></a>
+<a href="https://github.com/DoktaPola/Socials/graphs/contributors">
+<img src="https://avatars2.githubusercontent.com/u/44429468?s=460&u=4b37cd2315aaf9fd9fcfc101cc26416464ee8bf1&v=4" />
+<img src="https://avatars3.githubusercontent.com/u/63115848?s=460&u=c41e9e8fc2822c46d396880906687fe89f5e07d9&v=4" />
+<img src="https://avatars2.githubusercontent.com/u/61208923?s=460&v=4" />
+<img src="https://avatars3.githubusercontent.com/u/55359172?s=460&u=89ab963abf753c0f28b39a7c9dd51b4774f9e4fb&v=4" /></a>
 
 ---
 
