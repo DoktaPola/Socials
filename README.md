@@ -58,8 +58,8 @@ __Important:__ depending on your system, make sure to use `pip3` and `python3` i
 To run app, you'll need to run the **[file](https://github.com/DoktaPola/Socials/blob/master/main_design.py)** script you've just downloaded.
 
 App has 2 modes:
-	*Facebook mod
-	*VKontakte mod
+*Facebook mod
+*VKontakte mod
 You can put in your account details now by passing the username and password parameters to the **special form**, like so: 
 ```python
 username="abcd", 
