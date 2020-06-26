@@ -52,13 +52,14 @@ pip install bs4        (v0.0.1)
 pip install matplotlib (v3.1+)
 pip install networkx   (v2.3+)
 pip install pyvis      (v0.1+)
+pip install pyqt5      (v5.11+)
 ```
 __Important:__ depending on your system, make sure to use `pip3` and `python3` instead.
 
 
 #### Running
 
-To run app, you'll need to run the **[file](https://github.com/DoktaPola/Socials/blob/master/main_design.py)** script you've just downloaded.
+To run app, you'll need to run the **[file](https://github.com/DoktaPola/Socials/blob/master/main.py)** script you've just downloaded.
 
 App has 2 modes:
 - Facebook mod
