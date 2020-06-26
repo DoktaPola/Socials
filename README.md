@@ -78,7 +78,7 @@ Then you will have many options to work with the collecting data.
 ### Guide
 
 **[How to work with... ](https://drive.google.com/file/d/1uZEY3GyFS69tKOcNRcVyPe8VMq-PjWiS/view?usp=sharing ) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**
-Here you can find instraction and examples of work.
+Here you can find instruction and examples of work.
 
 
 
