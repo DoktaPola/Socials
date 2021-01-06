@@ -1,9 +1,7 @@
 import vk_api
 import json
 import time
-code = '2f44f3122f44f3122f44f312422f34e2f922f442f44f312711a582d5fc2a27b99d64bf4'
-app = 7344619
-secret = 'GJdQphxS7yjBShLWemze'
+
 vk_session = vk_api.VkApi(app_id=app, client_secret=secret, token=code)
 vk = vk_session.get_api()
 
